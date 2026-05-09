@@ -313,8 +313,13 @@ public class Gui_NhapThongTinBanVe extends JPanel {
             danhSachGaDen.add(mapGheGaDen.get(cho));
             // Format thông tin chỗ chi tiết
             String soHieuTau = lichTrinh.getChuyenTau() != null ? lichTrinh.getChuyenTau().getSoHieuTau() : "N/A";
-            String gaDi = lichTrinh.getGaDi() != null ? lichTrinh.getGaDi().getTenGa() : "";
-            String gaDen = lichTrinh.getGaDen() != null ? lichTrinh.getGaDen().getTenGa() : "";
+            // Lấy ga đi/đến thực tế của chặng (quan trọng cho trường hợp đi chặng giữa)
+            entity.Ga gaDiObj = mapGheGaDi.get(cho);
+            entity.Ga gaDenObj = mapGheGaDen.get(cho);
+            
+            String gaDi = gaDiObj != null ? gaDiObj.getTenGa() : (lichTrinh.getGaDi() != null ? lichTrinh.getGaDi().getTenGa() : "");
+            String gaDen = gaDenObj != null ? gaDenObj.getTenGa() : (lichTrinh.getGaDen() != null ? lichTrinh.getGaDen().getTenGa() : "");
+            
             String thoiGianKH = lichTrinh.getGioKhoiHanh() != null 
                 ? lichTrinh.getGioKhoiHanh().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) 
                 : "";

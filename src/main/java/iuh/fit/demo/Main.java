@@ -129,10 +129,35 @@ public class Main extends javax.swing.JFrame {
         header.addReloadEvent(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                System.out.println("🔄 Reloading current form - Menu: " + currentMenuIndex + " | SubMenu: " + currentSubMenuIndex);
-                showSelectedForm(currentMenuIndex, currentSubMenuIndex);
+                Component currentForm = main.getCurrentForm();
+                System.out.println("🔄 Reloading current form: " + (currentForm != null ? currentForm.getClass().getSimpleName() : "None"));
+                
+                if (currentForm instanceof Gui_TaiKhoan) {
+                    // Nếu là Gui_TaiKhoan, reload lại chính nó
+                    // Thử lấy mã NV hiện tại trên form để reload đúng ngữ cảnh
+                    String maNV = ((Gui_TaiKhoan) currentForm).getMaNVHienTai();
+                    if (maNV != null && !maNV.isEmpty()) {
+                        main.showForm(new Gui_TaiKhoan(maNV));
+                    } else {
+                        main.showForm(new Gui_TaiKhoan());
+                    }
+                } else {
+                    // Các form khác reload theo menu index
+                    showSelectedForm(currentMenuIndex, currentSubMenuIndex);
+                }
             }
         });
+        main.addPropertyChangeListener(evt -> {
+            if ("currentForm".equals(evt.getPropertyName())) {
+                Component newForm = (Component) evt.getNewValue();
+                if (newForm != null && newForm.getClass().getSimpleName().equals("Gui_NhapThongTinBanVe")) {
+                    header.setReloadEnabled(false);
+                } else {
+                    header.setReloadEnabled(true);
+                }
+            }
+        });
+
         //  Init google icon font
         IconFontSwing.register(GoogleMaterialDesignIcons.getIconFont());
         //  Start with this form

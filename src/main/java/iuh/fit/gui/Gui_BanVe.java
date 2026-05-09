@@ -84,6 +84,8 @@ public class Gui_BanVe extends JPanel {
             dchNgayVe.setEnabled(false);
         } else {
             radKhuHoi.setSelected(true);
+            lblNgayVe.setVisible(true);
+            dchNgayVe.setVisible(true);
             dchNgayVe.setEnabled(true);
             
             // ⚡ LƯU THÔNG TIN GỐC CHO KHỨ HỒI (để swap chiều đi/về)
@@ -140,6 +142,16 @@ public class Gui_BanVe extends JPanel {
         modelGioVe = (DefaultTableModel) tblGioVe.getModel();
         modelGioVe.setRowCount(0);
         
+        // Group radio buttons cho Loại hành trình
+        javax.swing.ButtonGroup groupLoaiHanhTrinh = new javax.swing.ButtonGroup();
+        groupLoaiHanhTrinh.add(radMotChieu);
+        groupLoaiHanhTrinh.add(radKhuHoi);
+        
+        // Group radio buttons cho Chiều mua vé
+        javax.swing.ButtonGroup groupChieuMuaVe = new javax.swing.ButtonGroup();
+        groupChieuMuaVe.add(radChieuDi);
+        groupChieuMuaVe.add(radChieuVe);
+        
         // Set ngày mặc định
         dchNgayDi.setDate(new Date());
         dchNgayVe.setDate(new Date());
@@ -150,8 +162,34 @@ public class Gui_BanVe extends JPanel {
         
         // Disable ngày về ban đầu
         dchNgayVe.setEnabled(false);
-        radKhuHoi.addActionListener(e -> dchNgayVe.setEnabled(radKhuHoi.isSelected()));
-        radMotChieu.addActionListener(e -> dchNgayVe.setEnabled(false));
+        radKhuHoi.addActionListener(e -> {
+            boolean isKhuHoi = radKhuHoi.isSelected();
+            dchNgayVe.setEnabled(isKhuHoi);
+            lblNgayVe.setEnabled(isKhuHoi);
+            
+            // Luôn hiện panel này nếu đã có kết quả tìm kiếm, nhưng chỉ cho chọn chiều về nếu là khứ hồi
+            if (pnlTuyen.isVisible()) {
+                pnlChieuMuaVe.setVisible(true);
+                radChieuVe.setEnabled(isKhuHoi);
+            }
+        });
+        
+        radMotChieu.addActionListener(e -> {
+            dchNgayVe.setEnabled(false);
+            lblNgayVe.setEnabled(false);
+            
+            // Vẫn hiện panel nhưng disable chiều về
+            if (pnlTuyen.isVisible()) {
+                pnlChieuMuaVe.setVisible(true);
+                radChieuVe.setEnabled(false);
+                
+                // Nếu đang ở chiều về thì phải quay lại chiều đi
+                if (radChieuVe.isSelected()) {
+                    radChieuDi.setSelected(true);
+                    chuyenChieuDi();
+                }
+            }
+        });
         
         // Ẩn các panel kết quả ban đầu
         pnlTuyen.setVisible(false);
@@ -662,6 +700,7 @@ public class Gui_BanVe extends JPanel {
         String gaDi = txtGaDi.getText().trim();
         String gaDen = txtGaDen.getText().trim();
         Date ngayDi = dchNgayDi.getDate();
+        Date ngayVe = dchNgayVe.getDate();
         
         if (gaDi.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập ga đi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
@@ -677,6 +716,11 @@ public class Gui_BanVe extends JPanel {
         
         if (ngayDi == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày đi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (radKhuHoi.isSelected() && ngayVe == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày về cho vé khứ hồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
         
@@ -718,29 +762,35 @@ public class Gui_BanVe extends JPanel {
             return;
         }
         
-        // Lưu lại thông tin gốc để swap khi chuyển chiều
-        if (radChieuDi.isSelected()) {
+        // 🆕 RESET TRẠNG THÁI CHO TÌM KIẾM MỚI (Nếu là bấm nút Tìm kiếm thủ công)
+        if (evt != null) {
+            // Lưu lại thông tin gốc cho chuyến đi mới
             gaDiGoc = gaDi;
             gaDenGoc = gaDen;
             ngayDiGoc = ngayDi;
-            ngayVeGoc = dchNgayVe.getDate();
-        }
-        
-        // Hiển thị panel tuyến
-        pnlTuyen.setVisible(true);
-        
-        // Auto chọn chuyến có giờ xuất phát sớm nhất TRƯỚC
-        if (!danhSachLichTrinh.isEmpty()) {
-            lichTrinhDangChon = timChuyenXuatPhatSomNhat(danhSachLichTrinh);
+            ngayVeGoc = ngayVe;
             
-            // 🔍 DEBUG: Log lịch trình auto chọn
-            if (lichTrinhDangChon != null) {
-                System.out.println("🔄 Auto chọn chuyến sớm nhất: Lịch trình " + lichTrinhDangChon.getMaLichTrinh() + 
-                    " | Giờ KH: " + (lichTrinhDangChon.getGioKhoiHanh() != null ? lichTrinhDangChon.getGioKhoiHanh() : "null"));
+            // Nếu là khứ hồi, luôn bắt đầu bằng Chiều đi
+            if (radKhuHoi.isSelected()) {
+                radChieuDi.setSelected(true);
             }
         }
         
-        // SAU ĐÓ mới hiển thị danh sách chuyến tàu (để render đúng màu)
+        // Clear trạng thái chọn cũ
+        lichTrinhDangChon = null;
+        toaDangChon = null;
+        
+        // Hiển thị panel kết quả
+        pnlTuyen.setVisible(true);
+        pnlChieuMuaVe.setVisible(true);
+        radChieuVe.setEnabled(radKhuHoi.isSelected());
+        
+        // Auto chọn chuyến có giờ xuất phát sớm nhất
+        if (!danhSachLichTrinh.isEmpty()) {
+            lichTrinhDangChon = timChuyenXuatPhatSomNhat(danhSachLichTrinh);
+        }
+        
+        // Hiển thị danh sách chuyến tàu
         hienThiDanhSachChuyenTauTrongPanel(danhSachLichTrinh);
         
         // Hiển thị danh sách toa của chuyến đã chọn
@@ -1513,7 +1563,9 @@ public class Gui_BanVe extends JPanel {
     private void themVaoGioVe(ChoNgoi cho, LichTrinh lt) {
         // Format: SE1 | Sài Gòn - Hà Nội
         String soHieuTau = lt.getChuyenTau() != null ? lt.getChuyenTau().getSoHieuTau() : "N/A";
-        String tuyen = soHieuTau + " | " + lt.getGaDi().getTenGa() + " - " + lt.getGaDen().getTenGa();
+        String gaDi = txtGaDi.getText().trim();
+        String gaDen = txtGaDen.getText().trim();
+        String tuyen = soHieuTau + " | " + gaDi + " - " + gaDen;
         String choNgoi = "Toa " + cho.getToa().getSoToa() + " - Ghế " + cho.getViTri();
         String chieu = radChieuDi.isSelected() ? "Chiều đi" : "Chiều về";
         
@@ -1558,72 +1610,27 @@ public class Gui_BanVe extends JPanel {
      */
     private void chuyenChieuVe() {
         System.out.println("🔄 ========== CHUYỂN CHIỀU VỀ ==========");
-        System.out.println("📍 gaDiGoc = " + gaDiGoc);
-        System.out.println("📍 gaDenGoc = " + gaDenGoc);
-        System.out.println("📍 ngayDiGoc = " + ngayDiGoc);
-        System.out.println("📍 ngayVeGoc = " + ngayVeGoc);
         
-        // Kiểm tra xem đã tìm kiếm chiều đi chưa
-        if (gaDiGoc == null || gaDenGoc == null) {
+        // Kiểm tra xem đã có thông tin gốc chưa
+        if (gaDiGoc == null || gaDenGoc == null || ngayVeGoc == null) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng tìm kiếm chiều đi trước!",
+                "Vui lòng chọn đầy đủ thông tin khứ hồi!",
                 "Thông báo", JOptionPane.WARNING_MESSAGE);
             radChieuDi.setSelected(true);
             return;
         }
         
-        // Kiểm tra xem có chọn khứ hồi không
-        if (radMotChieu.isSelected()) {
-            JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn 'Khứ hồi' để mua vé chiều về!",
-                "Thông báo", JOptionPane.WARNING_MESSAGE);
-            radChieuDi.setSelected(true);
-            return;
-        }
-        
-        // Kiểm tra có ngày về không
-        if (ngayVeGoc == null) {
-            JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn ngày về!",
-                "Thông báo", JOptionPane.WARNING_MESSAGE);
-            radChieuDi.setSelected(true);
-            return;
-        }
-        
-        // Cập nhật mã ga hiện tại khi đổi chiều
-        String tempGa = gaDiGoc;
-        gaDiGoc = gaDenGoc;
-        gaDenGoc = tempGa;
-        
-        // CẬP NHẬT UI (Quan trọng để btnTimKiem lấy đúng dữ liệu)
-        txtGaDi.setText(gaDiGoc);
-        txtGaDen.setText(gaDenGoc);
+        // Cập nhật UI: Đảo ga gốc
+        txtGaDi.setText(gaDenGoc);
+        txtGaDen.setText(gaDiGoc);
         dchNgayDi.setDate(ngayVeGoc);
-        dchNgayVe.setDate(null);
+        // Giữ nguyên ngày về để hiển thị đầy đủ thông tin khứ hồi
+        dchNgayVe.setDate(ngayVeGoc); 
         
-        java.util.List<entity.Ga> listGaDi = null;
-        java.util.List<entity.Ga> listGaDen = null;
-        try {
-            listGaDi = gaService.findByTenGa(gaDiGoc);
-            listGaDen = gaService.findByTenGa(gaDenGoc);
-        } catch (Exception e) { e.printStackTrace(); }
-        entity.Ga objGaDi = listGaDi.isEmpty() ? null : listGaDi.get(0);
-        entity.Ga objGaDen = listGaDen.isEmpty() ? null : listGaDen.get(0);
+        // Cập nhật mã ga hiện tại để tìm kiếm chặng về
+        updateMaGaHienTai(gaDenGoc, gaDiGoc);
         
-        if (objGaDi != null) maGaDiHienTai = objGaDi.getMaGa();
-        if (objGaDen != null) maGaDenHienTai = objGaDen.getMaGa();
-        
-        System.out.println("✅ ĐÃ SET UI CHIỀU VỀ: " + gaDiGoc + " -> " + gaDenGoc);
-        
-        System.out.println("✅ ĐÃ SET UI:");
-        System.out.println("   - Ga đi: " + gaDenGoc);
-        System.out.println("   - Ga đến: " + gaDiGoc);
-        System.out.println("   - Ngày đi: " + ngayVeGoc);
-        System.out.println("   - Ngày về: null");
-        
-        // Chỉ clear danh sách ghế đang chọn (chưa thêm vào giỏ)
-        // KHÔNG clear giỏ vé (để giữ vé chiều đi)
-        danhSachGheDangChon.clear();
+        System.out.println("✅ ĐÃ SET UI CHIỀU VỀ: " + gaDenGoc + " -> " + gaDiGoc);
         
         // Tìm kiếm chuyến tàu chiều về
         btnTimKiemActionPerformed(null);
@@ -1638,27 +1645,18 @@ public class Gui_BanVe extends JPanel {
     private void chuyenChieuDi() {
         System.out.println("🔄 ========== CHUYỂN VỀ CHIỀU ĐI ==========");
         
-        // Nếu chưa có thông tin gốc thì không làm gì
-        if (gaDiGoc == null || gaDenGoc == null) {
-            System.out.println("⚠️ Chưa có thông tin gốc!");
-            return;
-        }
+        if (gaDiGoc == null || gaDenGoc == null) return;
         
         // Restore lại ga đi/đến gốc
         txtGaDi.setText(gaDiGoc);
         txtGaDen.setText(gaDenGoc);
         dchNgayDi.setDate(ngayDiGoc);
-        dchNgayVe.setDate(ngayVeGoc); // ⚡ Restore lại ngày về
+        dchNgayVe.setDate(ngayVeGoc);
         
-        System.out.println("✅ ĐÃ RESTORE UI:");
-        System.out.println("   - Ga đi: " + gaDiGoc);
-        System.out.println("   - Ga đến: " + gaDenGoc);
-        System.out.println("   - Ngày đi: " + ngayDiGoc);
-        System.out.println("   - Ngày về: " + ngayVeGoc);
+        // Cập nhật mã ga hiện tại để tìm kiếm chặng đi
+        updateMaGaHienTai(gaDiGoc, gaDenGoc);
         
-        // Chỉ clear danh sách ghế đang chọn (chưa thêm vào giỏ)
-        // KHÔNG clear giỏ vé (để giữ vé chiều về)
-        danhSachGheDangChon.clear();
+        System.out.println("✅ ĐÃ RESTORE UI CHIỀU ĐI: " + gaDiGoc + " -> " + gaDenGoc);
         
         // Tìm kiếm lại chuyến tàu chiều đi
         btnTimKiemActionPerformed(null);
@@ -1666,108 +1664,49 @@ public class Gui_BanVe extends JPanel {
         // Highlight lại các ghế đã có trong giỏ vé (của chiều đi)
         SwingUtilities.invokeLater(() -> highlightGheDaCoTrongGioVe());
     }
+
+    /**
+     * Helper cập nhật mã ga đi/đến hiện tại
+     */
+    private void updateMaGaHienTai(String tenGaDi, String tenGaDen) {
+        try {
+            List<Ga> listGaDi = gaService.findByTenGa(tenGaDi);
+            List<Ga> listGaDen = gaService.findByTenGa(tenGaDen);
+            
+            if (listGaDi != null && !listGaDi.isEmpty()) maGaDiHienTai = listGaDi.get(0).getMaGa();
+            if (listGaDen != null && !listGaDen.isEmpty()) maGaDenHienTai = listGaDen.get(0).getMaGa();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     /**
      * Highlight lại các ghế đã có trong giỏ vé cho lịch trình hiện tại
      */
     private void highlightGheDaCoTrongGioVe() {
-        if (lichTrinhDangChon == null) {
-            return;
-        }
+        if (lichTrinhDangChon == null) return;
         
-        // Lấy ga đi/đến của lịch trình hiện tại để so sánh
-        String gaDiHienTai = txtGaDi.getText().trim();
-        String gaDenHienTai = txtGaDen.getText().trim();
+        // Xóa danh sách ghế đang chọn trên UI hiện tại
+        danhSachGheDangChon.clear();
         
-        // Duyệt qua giỏ vé
-        for (int i = 0; i < modelGioVe.getRowCount(); i++) {
-            // Cột 0: "Tuyến" (format: "Hà Nội → Sài Gòn")
-            // Cột 1: "Chỗ ngồi" (format: "Toa 1 - Ghế 1A" hoặc "Toa 6 - Giường 1")
-            // Cột 2: "Chiều"
+        // ⚡ TỐI ƯU: Duyệt qua mapGheLichTrinh để tìm ghế thuộc lịch trình hiện tại
+        // Không cần parse chuỗi và query database nhiều lần
+        for (Map.Entry<ChoNgoi, LichTrinh> entry : mapGheLichTrinh.entrySet()) {
+            ChoNgoi cho = entry.getKey();
+            LichTrinh lt = entry.getValue();
             
-            String tuyen = modelGioVe.getValueAt(i, 0).toString();
-            String choNgoi = modelGioVe.getValueAt(i, 1).toString();
-            
-            // Parse tuyến để lấy ga đi/đến
-            // Format: "SE1 | Hà Nội - Sài Gòn" hoặc "Hà Nội → Sài Gòn"
-            String gaDiTrongGio = null;
-            String gaDenTrongGio = null;
-            
-            if (tuyen.contains(" | ")) {
-                // Format: "SE1 | Hà Nội - Sài Gòn"
-                String[] parts1 = tuyen.split(" \\| ");
-                if (parts1.length == 2) {
-                    String[] parts2 = parts1[1].split(" - ");
-                    if (parts2.length == 2) {
-                        gaDiTrongGio = parts2[0].trim();
-                        gaDenTrongGio = parts2[1].trim();
-                    }
+            if (lt != null && lt.getMaLichTrinh().equals(lichTrinhDangChon.getMaLichTrinh())) {
+                if (!danhSachGheDangChon.contains(cho)) {
+                    danhSachGheDangChon.add(cho);
                 }
-            } else if (tuyen.contains(" → ")) {
-                // Format: "Hà Nội → Sài Gòn"
-                String[] parts = tuyen.split(" → ");
-                if (parts.length == 2) {
-                    gaDiTrongGio = parts[0].trim();
-                    gaDenTrongGio = parts[1].trim();
-                }
-            }
-            
-            if (gaDiTrongGio == null || gaDenTrongGio == null) {
-                continue;
-            }
-            
-            // Chỉ highlight ghế thuộc lịch trình hiện tại (cùng chiều)
-            if (!gaDiTrongGio.equals(gaDiHienTai) || !gaDenTrongGio.equals(gaDenHienTai)) {
-                continue; // Không cùng chiều, bỏ qua
-            }
-            
-            // Parse "Chỗ ngồi" để lấy maToa và viTri
-            // Format: "Toa X - Ghế Y" hoặc "Toa X - Giường Y"
-            try {
-                String[] parts = choNgoi.split(" - ");
-                if (parts.length == 2) {
-                    String soToa = parts[0].replace("Toa ", "").trim();
-                    String viTri = parts[1].replace("Ghế ", "").replace("Giường ", "").trim();
-                    
-                    // Tìm maToa từ soToa
-                    String maToa = null;
-                    if (lichTrinhDangChon.getChuyenTau() != null) {
-                        List<Toa> danhSachToa = null;
-                        try {
-                            danhSachToa = toaService.getToaBySoHieuTau(lichTrinhDangChon.getChuyenTau().getSoHieuTau());
-                        } catch (Exception e) { e.printStackTrace(); }
-                        for (Toa toa : danhSachToa) {
-                            if (String.valueOf(toa.getSoToa()).equals(soToa)) {
-                                maToa = toa.getMaToa();
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (maToa != null) {
-                        // Query ChoNgoi từ DB
-                        List<ChoNgoi> danhSachCho = null;
-                        try {
-                            danhSachCho = choNgoiService.getChoNgoiByMaToa(maToa);
-                        } catch (Exception e) { e.printStackTrace(); }
-                        for (ChoNgoi cn : danhSachCho) {
-                            if (String.valueOf(cn.getViTri()).equals(viTri)) {
-                                // Thêm vào danh sách ghế đang chọn
-                                if (!danhSachGheDangChon.contains(cn)) {
-                                    danhSachGheDangChon.add(cn);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         
-        // Nếu có ghế được thêm vào, tự động hiển thị toa đầu tiên
-        if (!danhSachGheDangChon.isEmpty() && lichTrinhDangChon.getChuyenTau() != null) {
+        // Refresh sơ đồ ghế của toa đang chọn để hiển thị màu xanh cho các ghế trong giỏ
+        if (toaDangChon != null) {
+            hienThiSoDoGheTrongPanel(toaDangChon, lichTrinhDangChon);
+        } else if (!danhSachGheDangChon.isEmpty()) {
+            // Nếu có ghế nhưng chưa chọn toa, hiển thị toa của ghế đầu tiên
             ChoNgoi gheFirst = danhSachGheDangChon.get(0);
             if (gheFirst.getToa() != null) {
                 hienThiSoDoGheTrongPanel(gheFirst.getToa(), lichTrinhDangChon);

@@ -55,6 +55,15 @@ public class Gui_TaiKhoan extends JPanel {
 
         timKiemVaChonDong(maNV);
     }
+    
+    /**
+     * Lấy mã nhân viên hiện tại đang hiển thị trên form
+     * @return Mã nhân viên hoặc null
+     */
+    public String getMaNVHienTai() {
+        String maNV = txtMaNV.getText().trim();
+        return maNV.isEmpty() ? null : maNV;
+    }
 
     private void loadData() {
         modelTaiKhoan.setRowCount(0);

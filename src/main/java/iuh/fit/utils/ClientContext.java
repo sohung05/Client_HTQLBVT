@@ -24,7 +24,7 @@ public class ClientContext {
     private static ILoaiVeService loaiVeService;
     private static ILichSuInVeService lichSuInVeService;
 
-    private static String serverIP = "172.20.10.5";
+    private static String serverIP = "192.168.1.18";
     private static int serverPort = 1099;
 
     public static void init() throws Exception {

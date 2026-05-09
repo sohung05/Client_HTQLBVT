@@ -212,6 +212,18 @@ public class Gui_NhapThongTinHanhTrinh extends JPanel {
         dchNgayVe.setMinSelectableDate(new Date());
         rightPanel.add(dchNgayVe, gbc);
         
+        // ⚡ ĐỒNG BỘ NGÀY: Ngày về không được trước ngày đi
+        dchNgayDi.addPropertyChangeListener("date", evt -> {
+            Date newDate = (Date) evt.getNewValue();
+            if (newDate != null) {
+                dchNgayVe.setMinSelectableDate(newDate);
+                // Nếu ngày về hiện tại < ngày đi mới, tự động dời ngày về
+                if (dchNgayVe.getDate() != null && dchNgayVe.getDate().before(newDate)) {
+                    dchNgayVe.setDate(newDate);
+                }
+            }
+        });
+        
         // Button Tìm kiếm
         gbc.gridy = 7;
         gbc.gridx = 0;
@@ -287,6 +299,22 @@ public class Gui_NhapThongTinHanhTrinh extends JPanel {
                 "Vui lòng chọn ngày đi!", 
                 "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
+        }
+        
+        // Validate ngày về cho khứ hồi
+        if (!motChieu) {
+            if (ngayVe == null) {
+                JOptionPane.showMessageDialog(this, 
+                    "Vui lòng chọn ngày về!", 
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (ngayVe.before(ngayDi)) {
+                JOptionPane.showMessageDialog(this, 
+                    "Ngày về không được trước ngày đi!", 
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
         
         if (gaDi.equalsIgnoreCase(gaDen)) {

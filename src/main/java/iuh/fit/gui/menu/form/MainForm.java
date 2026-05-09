@@ -3,7 +3,6 @@ package iuh.fit.gui.menu.form;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
-
 public class MainForm extends javax.swing.JPanel {
 
     public MainForm() {
@@ -14,10 +13,12 @@ public class MainForm extends javax.swing.JPanel {
     }
 
     public void showForm(Component form) {
+        Component oldForm = getCurrentForm();
         removeAll();
         add(form);
         repaint();
         revalidate();
+        firePropertyChange("currentForm", oldForm, form);
     }
 
     public Component getCurrentForm() {
