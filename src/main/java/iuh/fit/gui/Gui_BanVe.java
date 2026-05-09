@@ -159,6 +159,20 @@ public class Gui_BanVe extends JPanel {
         // Không cho chọn ngày trong quá khứ
         dchNgayDi.setMinSelectableDate(new Date());
         dchNgayVe.setMinSelectableDate(new Date());
+
+        // 🆕 Ràng buộc: Ngày về không được trước ngày đi
+        dchNgayDi.addPropertyChangeListener("date", evt -> {
+            if ("date".equals(evt.getPropertyName())) {
+                Date newDate = (Date) evt.getNewValue();
+                if (newDate != null) {
+                    dchNgayVe.setMinSelectableDate(newDate);
+                    // Nếu ngày về hiện tại đang trước ngày đi mới chọn -> reset về bằng ngày đi
+                    if (dchNgayVe.getDate() != null && dchNgayVe.getDate().before(newDate)) {
+                        dchNgayVe.setDate(newDate);
+                    }
+                }
+            }
+        });
         
         // Disable ngày về ban đầu
         dchNgayVe.setEnabled(false);
@@ -834,9 +848,9 @@ public class Gui_BanVe extends JPanel {
     }//GEN-LAST:event_radChieuDiActionPerformed
 
     private void btnXuLyDonTamActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnXuLyDonTamActionPerformed
-        // Mở Dialog Treo Đơn
+        // Mở Dialog Treo Đơn - Truyền 'this' để dialog có thể refresh sơ đồ ghế
         Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        Dialog_TreoDon dialogTreoDon = new Dialog_TreoDon(parentFrame, true);
+        Dialog_TreoDon dialogTreoDon = new Dialog_TreoDon(parentFrame, true, this);
         dialogTreoDon.setVisible(true);
         
         // Sau khi đóng dialog (hủy đơn hoặc xử lý), reload lại sơ đồ ghế

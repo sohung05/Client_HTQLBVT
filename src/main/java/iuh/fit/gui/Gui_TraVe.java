@@ -82,15 +82,21 @@ public class Gui_TraVe extends javax.swing.JPanel {
         lblLichSuIn.setFont(new java.awt.Font("Segoe UI", 1, 12));
         lblLichSuIn.setForeground(new java.awt.Color(255, 102, 0));
         jPanel2.add(lblLichSuIn);
-        // Thiết kế GroupLayout của jPanel2 khá phức tạp để chèn bằng code, 
-        // nhưng chúng ta có thể set layout cho nó đơn giản hơn hoặc add vào cuối.
+
+        // ⚡ TỰ ĐỘNG REFRESH KHI HIỆN PANEL
+        // Khi người dùng chuyển tab sang Trả Vé, bảng hóa đơn sẽ tự động load lại đơn mới nhất
+        this.addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && this.isShowing()) {
+                loadAllHoaDon();
+            }
+        });
     }
     
     /**
-     * Load 15 hóa đơn gần nhất
+     * Load 15 hóa đơn vừa thanh toán gần nhất (Chỉ lấy đến ngày hiện tại)
      */
     private void loadAllHoaDon() {
-        System.out.println("📋 Loading 15 hóa đơn gần nhất...");
+        System.out.println("📋 Đang tải 15 hóa đơn gần nhất...");
         modelHoaDon.setRowCount(0);
         
         List<HoaDon> danhSach = null;
@@ -100,22 +106,39 @@ public class Gui_TraVe extends javax.swing.JPanel {
             e.printStackTrace();
             danhSach = new java.util.ArrayList<>();
         }
-        System.out.println("✅ Tìm thấy " + danhSach.size() + " hóa đơn");
         
-        // Sắp xếp theo ngày giờ giảm dần (mới nhất trước)
-        danhSach.sort((hd1, hd2) -> {
-            if (hd1.getNgayTao() == null || hd2.getNgayTao() == null) return 0;
-            int dateCompare = hd2.getNgayTao().compareTo(hd1.getNgayTao());
-            if (dateCompare != 0) return dateCompare;
-            if (hd1.getGioTao() == null || hd2.getGioTao() == null) return 0;
-            return hd2.getGioTao().compareTo(hd1.getGioTao());
-        });
+        // Lấy ngày hiện tại để lọc (không hiện các đơn hàng "tương lai" từ demo)
+        java.time.LocalDate today = java.time.LocalDate.now();
         
-        // Chỉ lấy 15 hóa đơn đầu tiên
-        int count = 0;
-        for (HoaDon hd : danhSach) {
-            if (count >= 15) break;
-            
+        // Sắp xếp và lọc
+        List<HoaDon> filteredList = danhSach.stream()
+            .filter(hd -> hd.getNgayTao() != null && !hd.getNgayTao().toLocalDate().isAfter(today))
+            .sorted((hd1, hd2) -> {
+                // 1. So sánh Ngày (Mới nhất lên đầu)
+                int dateCompare = hd2.getNgayTao().compareTo(hd1.getNgayTao());
+                if (dateCompare != 0) return dateCompare;
+                
+                // 2. Ưu tiên Hóa đơn "THẬT" lên trên cùng
+                // Hóa đơn thật bắt đầu bằng HD và không chứa các ký tự đặc biệt của demo
+                String ma1 = hd1.getMaHoaDon();
+                String ma2 = hd2.getMaHoaDon();
+                boolean is1Real = ma1.startsWith("HD") && !ma1.contains("DEMO") && !ma1.contains("DBHD");
+                boolean is2Real = ma2.startsWith("HD") && !ma2.contains("DEMO") && !ma2.contains("DBHD");
+                
+                if (is1Real && !is2Real) return -1;
+                if (!is1Real && is2Real) return 1;
+                
+                // 3. Nếu cùng loại, so sánh Giờ (Mới nhất lên đầu)
+                if (hd1.getGioTao() == null || hd2.getGioTao() == null) return 0;
+                int timeCompare = hd2.getGioTao().compareTo(hd1.getGioTao());
+                if (timeCompare != 0) return timeCompare;
+                
+                return hd2.getMaHoaDon().compareTo(hd1.getMaHoaDon());
+            })
+            .limit(15)
+            .collect(java.util.stream.Collectors.toList());
+        
+        for (HoaDon hd : filteredList) {
             modelHoaDon.addRow(new Object[]{
                 hd.getMaHoaDon(),
                 hd.getNhanVien() != null ? hd.getNhanVien().getMaNhanVien() : "",
@@ -127,10 +150,9 @@ public class Gui_TraVe extends javax.swing.JPanel {
                 hd.getGioTao() != null ? hd.getGioTao().toLocalTime().format(timeFormatter) : "",
                 currencyFormat.format(hd.getTongTien())
             });
-            count++;
         }
         
-        System.out.println("✅ Đã load " + count + " hóa đơn gần nhất");
+        System.out.println("✅ Đã hiển thị " + filteredList.size() + " hóa đơn gần nhất.");
     }
     
     /**
@@ -239,33 +261,29 @@ public class Gui_TraVe extends javax.swing.JPanel {
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
         long hoursUntilDeparture = java.time.Duration.between(now, gioKhoiHanh).toHours();
         
-        System.out.println("⏱️ Thời gian còn lại đến khởi hành: " + hoursUntilDeparture + " giờ");
-        
-        // Phải trả trước ít nhất 24 giờ
-        if (hoursUntilDeparture < 24) {
-            System.out.println("❌ Không được trả vé: dưới 24 giờ trước khởi hành");
-            return -1; // Không được trả vé
-        }
+        System.out.println("⏱️ [CÁ NHÂN] Thời gian còn lại: " + hoursUntilDeparture + " giờ");
         
         double tienHoan = 0;
         
         if (hoursUntilDeparture < 4) {
-            // Dưới 4 giờ: không trả vé (nhưng đã check 24h ở trên rồi)
-            tienHoan = 0;
+            // Dưới 4 giờ: không được trả vé
+            System.out.println("❌ Không được trả vé cá nhân: dưới 4 giờ trước khởi hành");
+            return -1; 
         } else if (hoursUntilDeparture < 24) {
-            // Từ 4 đến dưới 24 giờ: hoàn 80%
+            // Từ 4 đến dưới 24 giờ: khấu 20% (hoàn 80%)
             tienHoan = giaVe * 0.8;
+            System.out.println("🔸 Khấu 20% (Dưới 24h)");
         } else {
-            // Trên 24 giờ: hoàn 90%
+            // Trên 24 giờ: khấu 10% (hoàn 90%)
             tienHoan = giaVe * 0.9;
+            System.out.println("🔸 Khấu 10% (Trên 24h)");
         }
         
         // Mức trả vé tối thiểu: 10.000đ/vé
-        if (tienHoan > 0 && tienHoan < 10000) {
-            tienHoan = 10000;
+        if (tienHoan > 0 && (giaVe - tienHoan) < 1000) { // Nếu phí khấu quá thấp
+             // Có thể tùy chỉnh lệ phí tối thiểu ở đây
         }
         
-        System.out.println("💰 Tiền hoàn trả: " + currencyFormat.format(tienHoan));
         return tienHoan;
     }
     
@@ -320,15 +338,27 @@ public class Gui_TraVe extends javax.swing.JPanel {
         if (lblLichSuIn != null) lblLichSuIn.setText("Thông tin in vé: Chưa chọn vé");
         
         List<entity.Ve> danhSachVe = null;
+        List<ChiTietHoaDon> chiTietList = new java.util.ArrayList<>();
         try {
             danhSachVe = veService.findByMaHoaDon(maHoaDon);
+            chiTietList = hoaDonService.getChiTietByMaHoaDon(maHoaDon);
         } catch (Exception e) {
             e.printStackTrace();
-            danhSachVe = new java.util.ArrayList<>();
+            if (danhSachVe == null) danhSachVe = new java.util.ArrayList<>();
         }
-        System.out.println("✅ Tìm thấy " + danhSachVe.size() + " vé (chưa trả)");
+        
+        System.out.println("✅ Tải " + danhSachVe.size() + " vé cho hóa đơn " + maHoaDon);
         
         for (Ve ve : danhSachVe) {
+            // ⚡ LẤY GIÁ THỰC TẾ TỪ DANH SÁCH CHI TIẾT ĐÃ TẢI
+            double giaThucTe = ve.getGiaVe();
+            for (ChiTietHoaDon ct : chiTietList) {
+                if (ct.getVe().getMaVe().equals(ve.getMaVe())) {
+                    giaThucTe = ct.getGiaVe() - ct.getMucGiam();
+                    break;
+                }
+            }
+            
             modelVe.addRow(new Object[]{
                 ve.getMaVe(),
                 ve.getSoCCCD() != null ? ve.getSoCCCD() : "",
@@ -345,8 +375,8 @@ public class Gui_TraVe extends javax.swing.JPanel {
                 ve.getChoNgoi() != null ? String.valueOf(ve.getChoNgoi().getViTri()) : "",
                 ve.getThoiGianLenTau() != null ? 
                     ve.getThoiGianLenTau().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "",
-                currencyFormat.format(ve.getGiaVe()),
-                0 // lichSuInVeDAO.countPrintTimes(ve.getMaVe()) // ⚡ Cột mới: Số lần in
+                currencyFormat.format(giaThucTe), // ⚡ Giá thực tế chính xác
+                0
             });
         }
     }
@@ -794,18 +824,20 @@ public class Gui_TraVe extends javax.swing.JPanel {
     private void btnTraTapVeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTraTapVeActionPerformed
         // ⚡ TRẢ TẬP VÉ (VÉ TẬP THỂ) - Tính tiền hoàn trả theo quy định
         
-        // Kiểm tra xem đã chọn hóa đơn chưa
-        int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn hóa đơn cần trả!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
-            return;
+        // Lấy thông tin hóa đơn
+        String maHoaDon = jTextField1.getText().trim();
+        if (maHoaDon.isEmpty()) {
+            int selectedRow = jTable1.getSelectedRow();
+            if (selectedRow < 0) {
+                JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn hóa đơn cần trả!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            maHoaDon = modelHoaDon.getValueAt(selectedRow, 0).toString();
         }
         
-        // Lấy thông tin hóa đơn từ database
-        String maHoaDon = modelHoaDon.getValueAt(selectedRow, 0).toString();
         HoaDon hoaDonCanTra = null;
         try {
             hoaDonCanTra = hoaDonService.findByMaHoaDon(maHoaDon);
@@ -837,6 +869,7 @@ public class Gui_TraVe extends javax.swing.JPanel {
         
         // Tính tổng tiền hoàn trả cho tất cả vé (theo quy định VÉ TẬP THỂ)
         double tongTienHoanLai = 0;
+        double tongGiaThucTeXuLy = 0; 
         boolean coVeKhongDuDieuKien = false;
         StringBuilder chiTietVe = new StringBuilder();
         
@@ -844,37 +877,39 @@ public class Gui_TraVe extends javax.swing.JPanel {
             String maVe = modelVe.getValueAt(i, 0).toString();
             String thoiGianKhoiHanhStr = modelVe.getValueAt(i, 9).toString();
             
-            // Lấy giá vé từ database để tránh lỗi parse từ GUI
             Ve veHienTai = null;
             try {
                 veHienTai = veService.findByMaVe(maVe);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (veHienTai == null) {
-                System.out.println("❌ Không tìm thấy vé: " + maVe);
-                continue;
-            }
-            double giaVe = veHienTai.getGiaVe();
+            } catch (Exception e) {}
             
-            // Parse thời gian khởi hành
+            if (veHienTai == null) continue;
+            
+            // ⚡ LẤY GIÁ THỰC TẾ TỪ CHI TIẾT HÓA ĐƠN
+            double giaVeThucTe = veHienTai.getGiaVe();
+            try {
+                List<ChiTietHoaDon> ctList = hoaDonService.getChiTietByMaHoaDon(maHoaDon);
+                for (ChiTietHoaDon ct : ctList) {
+                    if (ct.getVe().getMaVe().equals(veHienTai.getMaVe())) {
+                        giaVeThucTe = ct.getGiaVe() - ct.getMucGiam();
+                        break;
+                    }
+                }
+            } catch (Exception e) {}
+            
             java.time.LocalDateTime gioKhoiHanh = null;
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 gioKhoiHanh = java.time.LocalDateTime.parse(thoiGianKhoiHanhStr, formatter);
-            } catch (Exception e) {
-                System.out.println("❌ Lỗi parse thời gian khởi hành cho vé: " + maVe);
-                continue;
-            }
+            } catch (Exception e) { continue; }
             
-            // Tính tiền hoàn trả cho vé này theo quy định VÉ TẬP THỂ
-            double tienHoanVe = tinhTienHoanTraTapThe(giaVe, gioKhoiHanh);
+            double tienHoanVe = tinhTienHoanTraTapThe(giaVeThucTe, gioKhoiHanh);
             
             if (tienHoanVe < 0) {
                 coVeKhongDuDieuKien = true;
                 chiTietVe.append(String.format("• %s: Không đủ điều kiện trả\n", maVe));
             } else {
                 tongTienHoanLai += tienHoanVe;
+                tongGiaThucTeXuLy += giaVeThucTe;
                 chiTietVe.append(String.format("• %s: %s\n", maVe, currencyFormat.format(tienHoanVe)));
             }
         }
@@ -886,44 +921,24 @@ public class Gui_TraVe extends javax.swing.JPanel {
                            "Chi tiết:\n" + chiTietVe.toString() +
                            "\nBạn có muốn trả các vé còn lại không?";
             
-            int confirm = JOptionPane.showConfirmDialog(
-                this,
-                warning,
-                "Cảnh báo",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-            );
-            
-            if (confirm != JOptionPane.YES_OPTION) {
-                System.out.println("❌ Đã hủy trả tập vé");
-                return;
-            }
+            int confirm = JOptionPane.showConfirmDialog(this, warning, "Cảnh báo", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirm != JOptionPane.YES_OPTION) return;
         }
         
-        // Nếu không có vé nào được hoàn trả
         if (tongTienHoanLai <= 0) {
-            JOptionPane.showMessageDialog(this,
-                "Không có vé nào đủ điều kiện trả trong hóa đơn này!",
-                "Không thể trả vé",
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Không có vé nào đủ điều kiện trả!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        double chietKhau = tongGiaThucTeXuLy - tongTienHoanLai;
         
-        // Tính chiết khấu (số tiền bị trừ)
-        double chietKhau = tongTienHoaDon - tongTienHoanLai;
-        
-        // Hiện dialog xác nhận
         String message = String.format(
             "Xác nhận trả tập vé cho hóa đơn %s?\n\n" +
-            "Số lượng vé: %d\n" +
-            "Tổng tiền hóa đơn: %,.0f đ\n" +
-            "Chiết khấu: %,.0f đ\n" +
-            "Số tiền hoàn lại: %,.0f đ",
-            maHoaDon,
-            soLuongVe,
-            tongTienHoaDon,
-            chietKhau,
-            tongTienHoanLai
+            "Số lượng vé xử lý: %d\n" +
+            "Tổng số tiền khách đã trả (cho các vé này): %,.0f đ\n" +
+            "Phí khấu trừ (Phí trả vé): %,.0f đ\n" +
+            "Số tiền hoàn lại cho khách: %,.0f đ",
+            maHoaDon, soLuongVe, tongGiaThucTeXuLy, chietKhau, tongTienHoanLai
         );
         
         int choice = JOptionPane.showConfirmDialog(
@@ -958,26 +973,31 @@ public class Gui_TraVe extends javax.swing.JPanel {
                 }
             }
             
-            // 2. Cập nhật tổng tiền hóa đơn (trừ số tiền hoàn lại)
+            // 2. Cập nhật tổng tiền hóa đơn (Giữ lại tiền lệ phí/khấu)
             try {
                 HoaDon hd = hoaDonService.findByMaHoaDon(maHoaDon);
                 if (hd != null) {
-                    double tongTienMoi = tongTienHoaDon - tongTienHoanLai;
+                    double tongTienCu = hd.getTongTien();
+                    // Tổng tiền mới = Tổng tiền cũ - Số tiền đã hoàn lại cho khách
+                    // (Tương đương với: Tiền các vé còn lại + Tiền phí của các vé đã trả)
+                    double tongTienMoi = tongTienCu - tongTienHoanLai;
                     if (tongTienMoi < 0) tongTienMoi = 0;
+                    
                     hd.setTongTien(tongTienMoi);
                     hoaDonService.update(hd);
-                    System.out.println("✅ Đã cập nhật tổng tiền hóa đơn: " + maHoaDon + 
-                        " | Cũ: " + currencyFormat.format(tongTienHoaDon) + 
-                        " | Mới: " + currencyFormat.format(tongTienMoi) +
-                        " | Đã trừ: " + currencyFormat.format(tongTienHoanLai));
+                    
+                    System.out.println("DEBUG [TraTapVe]: " + maHoaDon);
+                    System.out.println("   - Tong tien cu: " + tongTienCu);
+                    System.out.println("   - Hoan lai khach: " + tongTienHoanLai);
+                    System.out.println("   - Giu lai (Tong moi): " + tongTienMoi);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("❌ Lỗi cập nhật hóa đơn: " + e.getMessage());
             }
             
             // 3. Hiển thị thông báo thành công
             JOptionPane.showMessageDialog(this,
-                String.format("Đã trả tập vé thành công!\nSố vé đã trả: %d/%d\nSố tiền hoàn lại: %,.0f đ",
+                String.format("Đã trả tập vé thành công!\nSố vé đã trả: %d/%d\nSố tiền hoàn lại cho khách: %,.0f đ",
                     soVeDaTra, soLuongVe, tongTienHoanLai),
                 "Thành công",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -1048,6 +1068,27 @@ public class Gui_TraVe extends javax.swing.JPanel {
         }
         double giaVe = veCanTra.getGiaVe();
         
+        // Lấy mã hóa đơn để truy vấn chi tiết
+        String maHoaDon = jTextField1.getText().trim();
+        if (maHoaDon.isEmpty()) {
+            int hoaDonRow = jTable1.getSelectedRow();
+            maHoaDon = hoaDonRow >= 0 ? modelHoaDon.getValueAt(hoaDonRow, 0).toString() : null;
+        }
+        
+        // ⚡ LẤY GIÁ THỰC TẾ TỪ CHI TIẾT HÓA ĐƠN
+        double giaVeThucTe = giaVe;
+        if (maHoaDon != null) {
+            try {
+                List<ChiTietHoaDon> ctList = hoaDonService.getChiTietByMaHoaDon(maHoaDon);
+                for (ChiTietHoaDon ct : ctList) {
+                    if (ct.getVe().getMaVe().equals(maVe)) {
+                        giaVeThucTe = ct.getGiaVe() - ct.getMucGiam();
+                        break;
+                    }
+                }
+            } catch (Exception e) {}
+        }
+        
         // Parse thời gian khởi hành (format: "dd/MM/yyyy HH:mm")
         java.time.LocalDateTime gioKhoiHanh = null;
         try {
@@ -1062,8 +1103,8 @@ public class Gui_TraVe extends javax.swing.JPanel {
             return;
         }
         
-        // Tính tiền hoàn trả theo quy định VÉ CÁ NHÂN
-        double tienHoanLai = tinhTienHoanTraCaNhan(giaVe, gioKhoiHanh);
+        // Tính tiền hoàn trả dựa trên GIÁ THỰC TẾ KHÁCH TRẢ
+        double tienHoanLai = tinhTienHoanTraCaNhan(giaVeThucTe, gioKhoiHanh);
         
         if (tienHoanLai < 0) {
             JOptionPane.showMessageDialog(this,
@@ -1074,17 +1115,17 @@ public class Gui_TraVe extends javax.swing.JPanel {
             return;
         }
         
-        // Tính chiết khấu (số tiền bị trừ)
-        double chietKhau = giaVe - tienHoanLai;
+        // Tính chiết khấu (số tiền bị trừ) = Giá thực tế - Tiền hoàn lại
+        double chietKhau = giaVeThucTe - tienHoanLai;
         
         // Hiển thị dialog xác nhận
         String message = String.format(
             "Xác nhận trả vé %s?\n\n" +
-            "Giá vé: %,.0f đ\n" +
-            "Chiết khấu: %,.0f đ\n" +
-            "Số tiền hoàn lại: %,.0f đ",
+            "Số tiền khách đã trả cho vé này: %,.0f đ\n" +
+            "Phí khấu trừ (Phí trả vé): %,.0f đ\n" +
+            "Số tiền hoàn lại cho khách: %,.0f đ",
             maVe,
-            giaVe,
+            giaVeThucTe,
             chietKhau,
             tienHoanLai
         );
@@ -1119,24 +1160,23 @@ public class Gui_TraVe extends javax.swing.JPanel {
             }
             
             // 2. Lấy mã hóa đơn và cập nhật tổng tiền (trừ số tiền hoàn lại)
-            int hoaDonRow = jTable1.getSelectedRow();
-            String maHoaDon = hoaDonRow >= 0 ? modelHoaDon.getValueAt(hoaDonRow, 0).toString() : null;
-            
             if (maHoaDon != null) {
-                // Lấy tổng tiền hiện tại của hóa đơn
                 try {
                     HoaDon hoaDon = hoaDonService.findByMaHoaDon(maHoaDon);
                     if (hoaDon != null) {
                         double tongTienCu = hoaDon.getTongTien();
-                        double tongTienMoi = tongTienCu - tienHoanLai; // Trừ số tiền hoàn lại
-                        if (tongTienMoi < 0) tongTienMoi = 0; // Đảm bảo không âm
+                        // Cập nhật tổng tiền hóa đơn: 
+                        // Mới = Tổng cũ - Số tiền thực tế trả lại cho khách
+                        double tongTienMoi = tongTienCu - tienHoanLai;
+                        if (tongTienMoi < 0) tongTienMoi = 0;
                         
                         hoaDon.setTongTien(tongTienMoi);
                         hoaDonService.update(hoaDon);
-                        System.out.println("✅ Đã cập nhật tổng tiền hóa đơn: " + maHoaDon + 
-                            " | Cũ: " + currencyFormat.format(tongTienCu) + 
-                            " | Mới: " + currencyFormat.format(tongTienMoi) +
-                            " | Đã trừ: " + currencyFormat.format(tienHoanLai));
+                        
+                        System.out.println("DEBUG [TraVeDon]: " + maHoaDon);
+                        System.out.println("   - Tong tien cu: " + tongTienCu);
+                        System.out.println("   - Hoan lai khach: " + tienHoanLai);
+                        System.out.println("   - Giu lai (Tong moi): " + tongTienMoi);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

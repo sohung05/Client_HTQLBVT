@@ -24,11 +24,21 @@ public class Dialog_TreoDon extends javax.swing.JDialog {
     private javax.swing.Timer updateTimer; // Timer để update thời gian còn lại
     private boolean isSearching = false; // Flag đánh dấu đang trong chế độ tìm kiếm
     
+    private Gui_BanVe guiBanVe = null;
+    
     /**
      * Creates new form Dialog_TreoDon
      */
     public Dialog_TreoDon(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        initComponents();
+        setLocationRelativeTo(parent);
+        initCustomComponents();
+    }
+    
+    public Dialog_TreoDon(java.awt.Frame parent, boolean modal, Gui_BanVe guiBanVe) {
+        super(parent, modal);
+        this.guiBanVe = guiBanVe;
         initComponents();
         setLocationRelativeTo(parent);
         initCustomComponents();
@@ -137,6 +147,11 @@ public class Dialog_TreoDon extends javax.swing.JDialog {
                 
                 // Giải phóng triệt để trên RAM (Xử lý hiển thị)
                 QuanLyGheGiuCho.xoaTatCaGheCuaDonTreo(maDon, maGheList);
+                
+                // ⚡ REFRESH SƠ ĐỒ GHẾ NGAY LẬP TỨC
+                if (guiBanVe != null) {
+                    guiBanVe.reloadSoDoGhe();
+                }
                 
                 // Đánh dấu để xóa khỏi bảng
                 rowsToRemove.add(i);
@@ -484,8 +499,10 @@ public class Dialog_TreoDon extends javax.swing.JDialog {
         
         if (confirm == JOptionPane.YES_OPTION) {
             // ⚡ LẤY THÔNG TIN GHẾ TỪ DATA TRƯỚC:
+            // ⚡ Lấy lại đơn đầy đủ từ Server để đảm bảo có danh sách vé
             DonTreoDat don = QuanLyDonTreo.layDonTreo(maDonChon);
             List<String> maGheList = new java.util.ArrayList<>();
+            
             if (don != null && don.getDanhSachVe() != null) {
                 for (DonTreoDat.ThongTinVeTam ve : don.getDanhSachVe()) {
                     if (ve.getChoNgoi() != null) {
@@ -494,15 +511,24 @@ public class Dialog_TreoDon extends javax.swing.JDialog {
                 }
             }
             
+            System.out.println("🗑️ Hủy đơn " + maDonChon + " - Giải phóng " + maGheList.size() + " ghế");
+            
             // Gọi lệnh xóa đơn treo trên Server (Server sẽ xóa cứng trong Database)
             boolean thanhCong = QuanLyDonTreo.xoaDonTreo(maDonChon);
             
             if (thanhCong) {
-                // Giải phóng triệt để trên RAM (Cần danh sách mã ghế để xóa đúng mục)
+                System.out.println("✅ Đã hủy đơn " + maDonChon + " trên Server. Tiến hành giải phóng " + maGheList.size() + " ghế.");
+                
+                // ✅ GIẢI PHÓNG TRÊN RAM CLIENT: Xóa khỏi danh sách giữ chỗ local và remote
                 QuanLyGheGiuCho.xoaTatCaGheCuaDonTreo(maDonChon, maGheList);
                 
                 // Reload table trong dialog
                 loadTatCaDonTreo();
+                
+                // ⚡ REFRESH SƠ ĐỒ GHẾ NGAY LẬP TỨC TRÊN GUI BÁN VÉ
+                if (guiBanVe != null) {
+                    guiBanVe.reloadSoDoGhe();
+                }
                 
                 JOptionPane.showMessageDialog(this,
                     "Hủy đơn thành công!",
