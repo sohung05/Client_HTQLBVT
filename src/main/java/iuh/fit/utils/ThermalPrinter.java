@@ -360,8 +360,9 @@ public class ThermalPrinter {
     private void savePrintHistory(List<ChiTietHoaDon> list) {
         if (list == null || list.isEmpty()) return;
         new Thread(() -> {
-            dao.LichSuInVe_DAO dao = new dao.LichSuInVe_DAO();
-            entity.NhanVien nv = utils.SessionManager.getInstance().getNhanVienDangNhap();
+            try {
+                service.ILichSuInVeService service = ClientContext.getLichSuInVeService();
+                entity.NhanVien nv = SessionManager.getInstance().getNhanVienDangNhap();
             for (ChiTietHoaDon ct : list) {
                 if (ct.getVe() != null) {
                     entity.LichSuInVe ls = entity.LichSuInVe.builder()
@@ -371,8 +372,11 @@ public class ThermalPrinter {
                             .loaiIn(isAutoPrint ? "In sau bán (Tự động)" : "In hóa đơn")
                             .ghiChu(isAutoPrint ? "Hệ thống tự động in sau khi thanh toán" : "In từ quản lý")
                             .build();
-                    dao.insert(ls);
+                    service.insert(ls);
                 }
+            }
+            } catch (Exception e) {
+                System.err.println("❌ Lỗi lưu lịch sử in: " + e.getMessage());
             }
         }).start();
     }
@@ -380,8 +384,9 @@ public class ThermalPrinter {
     private static void savePrintHistory(entity.Ve ve, String loaiIn, boolean isAuto) {
         if (ve == null) return;
         new Thread(() -> {
-            dao.LichSuInVe_DAO dao = new dao.LichSuInVe_DAO();
-            entity.NhanVien nv = utils.SessionManager.getInstance().getNhanVienDangNhap();
+            try {
+                service.ILichSuInVeService service = ClientContext.getLichSuInVeService();
+                entity.NhanVien nv = SessionManager.getInstance().getNhanVienDangNhap();
             entity.LichSuInVe ls = entity.LichSuInVe.builder()
                     .ve(ve)
                     .nhanVien(nv)
@@ -389,7 +394,10 @@ public class ThermalPrinter {
                     .loaiIn(loaiIn)
                     .ghiChu(isAuto ? "Hệ thống tự động in sau khi thanh toán" : "In lẻ từ quản lý")
                     .build();
-            dao.insert(ls);
+            service.insert(ls);
+            } catch (Exception e) {
+                System.err.println("❌ Lỗi lưu lịch sử in lẻ: " + e.getMessage());
+            }
         }).start();
     }
 

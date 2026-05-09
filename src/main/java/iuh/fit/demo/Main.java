@@ -32,6 +32,7 @@ public class Main extends javax.swing.JFrame {
     private Animator animator;
     private int currentMenuIndex = 0;
     private int currentSubMenuIndex = -1;
+    private Gui_NhapThongTinHanhTrinh.ThongTinHanhTrinh lastThongTinHanhTrinh;
 
     public Main() {
         initComponents();
@@ -157,12 +158,19 @@ public class Main extends javax.swing.JFrame {
             case 1: // Vé
                 switch (subMenuIndex) {
                     case 0: // Bán Vé
-                        Gui_NhapThongTinHanhTrinh guiNhapThongTin = new Gui_NhapThongTinHanhTrinh();
-                        guiNhapThongTin.setCallback(info -> {
-                            Gui_BanVe guiBanVe = new Gui_BanVe(info);
-                            main.showForm(guiBanVe);
-                        });
-                        main.showForm(guiNhapThongTin);
+                        // Nếu đang ở Gui_BanVe thì nạp lại chính trang đó với info cũ
+                        if (main.getCurrentForm() instanceof Gui_BanVe && lastThongTinHanhTrinh != null) {
+                            main.showForm(new Gui_BanVe(lastThongTinHanhTrinh));
+                        } else {
+                            // Nếu không thì mới hiện trang nhập thông tin
+                            Gui_NhapThongTinHanhTrinh guiNhapThongTin = new Gui_NhapThongTinHanhTrinh();
+                            guiNhapThongTin.setCallback(info -> {
+                                lastThongTinHanhTrinh = info;
+                                Gui_BanVe guiBanVe = new Gui_BanVe(info);
+                                main.showForm(guiBanVe);
+                            });
+                            main.showForm(guiNhapThongTin);
+                        }
                         break;
                     case 1: // Trả Vé
                         main.showForm(new Gui_TraVe());

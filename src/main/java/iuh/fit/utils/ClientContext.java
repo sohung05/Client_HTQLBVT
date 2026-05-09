@@ -22,6 +22,7 @@ public class ClientContext {
     private static IKhuyenMaiService khuyenMaiService;
     private static IThongKeService thongKeService;
     private static ILoaiVeService loaiVeService;
+    private static ILichSuInVeService lichSuInVeService;
 
     private static String serverIP = "172.20.10.5";
     private static int serverPort = 1099;
@@ -45,6 +46,7 @@ public class ClientContext {
         khuyenMaiService = (IKhuyenMaiService) Naming.lookup(baseAddr + "KhuyenMaiService");
         thongKeService = (IThongKeService) Naming.lookup(baseAddr + "ThongKeService");
         loaiVeService = (ILoaiVeService) Naming.lookup(baseAddr + "LoaiVeService");
+        lichSuInVeService = (ILichSuInVeService) Naming.lookup(baseAddr + "LichSuInVeService");
         
         System.out.println("✅ All RMI Services connected!");
     }
@@ -63,4 +65,5 @@ public class ClientContext {
     public static IKhuyenMaiService getKhuyenMaiService() { return khuyenMaiService; }
     public static IThongKeService getThongKeService() { return thongKeService; }
     public static ILoaiVeService getLoaiVeService() { return loaiVeService; }
+    public static ILichSuInVeService getLichSuInVeService() { return lichSuInVeService; }
 }

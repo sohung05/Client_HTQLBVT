@@ -861,8 +861,20 @@ public class Gui_NhapThongTinBanVe extends JPanel {
         
         // Xử lý sau khi đóng dialog
         if (dlg.isThanhToanThanhCong()) {
-            // ⚠️ Logic quay về Gui_BanVe đã xử lý TRONG Diglog_ThanhToan
-            // → Không cần xử lý lại ở đây nữa
+            if (previousGuiBanVe != null) {
+                // Xóa tất cả ghế đã chọn trong Gui_BanVe (làm trống giỏ hàng sau thanh toán)
+                previousGuiBanVe.xoaTatCaGheDaChon();
+                
+                // Quay lại Gui_BanVe
+                iuh.fit.gui.menu.form.MainForm mainForm = 
+                    (iuh.fit.gui.menu.form.MainForm) SwingUtilities.getAncestorOfClass(
+                        iuh.fit.gui.menu.form.MainForm.class, this);
+                
+                if (mainForm != null) {
+                    mainForm.showForm(previousGuiBanVe);
+                    previousGuiBanVe.reloadSoDoGhe(); // Cập nhật lại sơ đồ ghế để thấy ghế vừa mua đã bị khóa
+                }
+            }
             
         } else if (dlg.isNhapLai()) {
             // Quay lại form này (giữ nguyên dữ liệu)

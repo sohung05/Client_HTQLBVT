@@ -141,6 +141,12 @@ public class Diglog_ThanhToan extends JDialog {
         
         lblKhuyenMaiValue.setText(khuyenMai > 0 ? currencyFormat.format(khuyenMai) + " ₫" : "0 ₫");
         lblTienThuaValue.setText("0 ₫");
+        
+        // ⚡ Nếu đơn này là đơn đã treo rồi thì không cho phép bấm treo lại (tránh trùng lặp)
+        if (this.donTreo != null) {
+            btnTreoDon.setEnabled(false);
+            btnTreoDon.setToolTipText("Đơn hàng này đã được treo");
+        }
     }
     
     /**

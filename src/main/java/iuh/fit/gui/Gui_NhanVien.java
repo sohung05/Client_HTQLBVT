@@ -40,6 +40,9 @@ public class Gui_NhanVien extends JPanel {
         loadData();
         addTableSelectionListener();
         addRealTimeMaNVListener();
+        
+        // ⚡ Không cho phép nhập mã nhân viên thủ công (tự động sinh)
+        txtMaNV.setEditable(false);
     }
 
     private void addRealTimeMaNVListener() {
