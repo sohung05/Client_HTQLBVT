@@ -62,8 +62,8 @@ public class Gui_Dashboard extends JPanel {
         dashboardService = ClientContext.getDashboardService();
 
         // ================= PANEL THỐNG KÊ =================
-        JPanel panelStats = new JPanel(new GridLayout(1, 4, 20, 10));
-        panelStats.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panelStats = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        panelStats.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 20));
         panelStats.setBackground(Color.WHITE);
 
         lblDoanhThu = new JLabel("0");
@@ -80,7 +80,7 @@ public class Gui_Dashboard extends JPanel {
         panelStats.add(createStatCard("Khách hàng mới hôm nay", lblKhachHang,
                 new Color(255, 248, 225), new Color(245, 124, 0)));
 
-        panelChart = new JPanel(new BorderLayout(20, 0));
+        panelChart = new JPanel(new BorderLayout(10, 0));
         panelChart.setPreferredSize(new Dimension(900, 350));
         panelChart.setBackground(Color.WHITE);
         panelChart.setBorder(BorderFactory.createTitledBorder("Thống kê tổng quan"));
@@ -219,14 +219,14 @@ public class Gui_Dashboard extends JPanel {
 
         // ChartPanel với tooltip
         ChartPanel comboChartPanel = new ChartPanel(comboChart);
-        comboChartPanel.setPreferredSize(new Dimension(900, 500));
+        comboChartPanel.setPreferredSize(new Dimension(600, 320));
         comboChartPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 500));
 
         comboChartPanel.setDisplayToolTips(true);
 
 // ================= CẢNH BÁO LẤP ĐẦY ================
         JPanel occupancyPanel = createOccupancyAlertPanel();
-        occupancyPanel.setPreferredSize(new Dimension(900, 300));
+        occupancyPanel.setPreferredSize(new Dimension(600, 220));
 
         // Pie chart
         Map<String, Double> tk = dashboardService.getThongKeTongQuan();
@@ -262,7 +262,7 @@ public class Gui_Dashboard extends JPanel {
         leftPanel.add(occupancyPanel);  // Bảng cảnh báo lấp đầy
 
         panelChart.removeAll();
-        panelChart.setLayout(new BorderLayout(20, 0));
+        panelChart.setLayout(new BorderLayout(10, 0));
         panelChart.add(leftPanel, BorderLayout.CENTER);
         panelChart.add(rightPanel, BorderLayout.EAST);
 
@@ -278,7 +278,8 @@ public class Gui_Dashboard extends JPanel {
         RoundedPanel card = new RoundedPanel(20);
         card.setLayout(new BorderLayout());
         card.setBackground(bg);
-        card.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        card.setPreferredSize(new Dimension(300, 85));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         JLabel t = new JLabel(title, SwingConstants.LEFT);
         t.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -447,7 +448,7 @@ public class Gui_Dashboard extends JPanel {
         plot.setBackgroundPaint(Color.WHITE);
 
         ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension(400, 300));
+        panel.setPreferredSize(new Dimension(300, 250));
 
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setBackground(Color.WHITE);
@@ -506,7 +507,7 @@ public class Gui_Dashboard extends JPanel {
         plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{2}")); // Chỉ hiển thị %
         
         ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(380, 300));
+        chartPanel.setPreferredSize(new Dimension(300, 250));
         
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(Color.WHITE);

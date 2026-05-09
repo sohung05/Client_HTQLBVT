@@ -23,7 +23,7 @@ public class ClientContext {
     private static IThongKeService thongKeService;
     private static ILoaiVeService loaiVeService;
 
-    private static String serverIP = "localhost";
+    private static String serverIP = "172.20.10.5";
     private static int serverPort = 1099;
 
     public static void init() throws Exception {
