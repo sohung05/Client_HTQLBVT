@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn sử dụng hệ thống bán vé tàu</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-train"></i>
+                <h1>Hệ thống Bán vé tàu</h1>
+            </div>
+            <!-- <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Tìm kiếm nội dung...">
+            </div> -->
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Content -->
+        <main class="content">
+            <!-- 1. Giới thiệu -->
+            <section id="gioi-thieu" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-circle-info"></i> Giới thiệu</h2>
+                <div class="card">
+                    <h3>Giới thiệu hệ thống bán vé tàu</h3>
+                    <p>Hệ thống bán vé tàu là giải pháp phần mềm hiện đại giúp tự động hóa và tối ưu hóa quy trình phân phối vé cho các nhà ga. Hệ thống cung cấp công cụ đắc lực cho nhân viên bán vé và ban quản lý.</p>
+                    
+                    <h3>Mục đích của phần mềm</h3>
+                    <p>Mục đích chính là giảm thiểu thời gian chờ đợi của khách hàng, tăng tính minh bạch trong doanh thu và hỗ trợ việc đặt/trả vé một cách nhanh chóng, tiện lợi nhất.</p>
+
+                    <h3>Các chức năng chính</h3>
+                    <ul class="styled-list">
+                        <li>Bán và xuất vé tàu, hóa đơn điện tử.</li>
+                        <li>Hỗ trợ khách hàng trả vé, đổi vé.</li>
+                        <li>Quản lý thông tin khách hàng, nhân viên và các chương trình khuyến mãi.</li>
+                        <li>Báo cáo thống kê chi tiết theo thời gian thực.</li>
+                    </ul>
+
+                    <h3>Vai trò</h3>
+                    <p><strong>Nhân viên:</strong> Thực hiện các thao tác bán vé, trả vé, tra cứu thông tin cho khách hàng.<br>
+                    <strong>Quản lý:</strong> Quản lý danh sách nhân viên, theo dõi doanh thu và thiết lập khuyến mãi.</p>
+                </div>
+            </section>
+
+            <!-- 2. Đăng nhập -->
+            <section id="dang-nhap" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-right-to-bracket"></i> Hướng dẫn đăng nhập</h2>
+                <div class="card">
+                    <h3>Cách đăng nhập hệ thống</h3>
+                    <p>Để bắt đầu sử dụng hệ thống, nhân viên và quản lý cần đăng nhập bằng tài khoản đã được cấp.</p>
+                    <img src="/img/dangnhap.png" alt="" style="width: 90%; ">
+                    <ol class="styled-list">
+                        <li>Nhập <strong>Tên đăng nhập</strong> (Tên nhân viên).</li>
+                        <li>Nhập <strong>Mật khẩu</strong> được cấp của bạn.</li>
+                        <li>Nhấn nút <strong>Đăng nhập</strong>.</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- 3. Dashboard -->
+            <section id="dashboard" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-chart-pie"></i> Hướng dẫn Dashboard</h2>
+                <div class="card">
+                    <p>Ngay sau khi đăng nhập, màn hình đầu tiên hiển thị là Dashboard (Bảng điều khiển tổng quan). Tại đây bạn có thể xem nhanh các dữ liệu quan trọng.</p>
+                    <img src="/img/dashboard.png" alt="" style="width: 90%">
+                    <h3>Giải thích các thẻ thống kê</h3>
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <i class="fa-solid fa-money-bill-wave text-blue"></i>
+                            <h4>Tổng doanh thu</h4>
+                            <p>Tổng số tiền thu được từ bán vé (đã trừ vé trả) trong tháng hiện tại.</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Vé đã bán</h4>
+                            <p>Số lượng vé được bán thành công trong tháng hiện tại.</p>
+                        </div>
+                         <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Khuyến mãi sắp hết hạn</h4>
+                            <p>Khuyến mãi sắp hết hạn trong 7 ngày.</p>
+                        </div>
+                         <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Khách hàng</h4>
+                            <p>Khách hàng mới trong vòng 7 ngày.</p>
+                        </div>
+                    </div>
+
+                    <h3>Ý nghĩa biểu đồ doanh thu</h3>
+                    <p>Biểu đồ đường hiển thị biến động doanh thu theo từng ngày trong tháng, giúp quản lý nắm bắt xu hướng khách hàng.</p>
+                      <div class="grid-2">
+                        <div class="info-card">
+                            <i class="fa-solid fa-money-bill-wave text-blue"></i>
+                            <h4>Xu hướng doanh thu và số vé theo tháng năm 2026</h4>
+                            <p>Tổng số tiền thu được từ bán vé (đã trừ vé trả) trong tháng hiện tại.</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Tỷ lệ vé</h4>
+                            <p>Số lượng vé được bán thành công trong tháng hiện tại.</p>
+                        </div>
+                         <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Doanh thu theo tuyến trong tháng</h4>
+                            <p>Khuyến mãi sắp hết hạn trong 7 ngày.</p>
+                        </div>
+                         <div class="info-card">
+                            <i class="fa-solid fa-ticket text-blue"></i>
+                            <h4>Tỷ lệ vé đặt theo tuyến</h4>
+                            <p>Khách hàng mới trong vòng 7 ngày.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Bán vé -->
+            <section id="ban-ve" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-ticket"></i> Hướng dẫn bán vé</h2>
+                <div class="card">
+                    <p>Quá trình bán vé được thiết kế thành các bước tuần tự để nhân viên dễ dàng thao tác mà không bị bỏ sót thông tin.</p>
+                    
+                    <h3>Các bước bán vé</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot">1</div>
+                            <div class="timeline-content">
+                                <h4>Chọn chặng đường</h4>
+                                <p>Nhập <strong>Ga đi</strong> và <strong>Ga đến</strong>, sau đó chọn <strong>Ngày đi</strong> (và ngày về nếu có).</p>
+                                <img src="/img/muave.png" alt="" style="width: 80%">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">2</div>
+                            <div class="timeline-content">
+                                <h4>Chọn loại vé & Chuyến tàu</h4>
+                                <p>Hệ thống sẽ hiển thị danh sách các chuyến tàu trong ngày. Bạn chọn chuyến phù hợp với yêu cầu khách hàng.</p>
+                                  <img src="/img/muave1.png" alt="" style="width: 80%">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">3</div>
+                            <div class="timeline-content">
+                                <h4>Chọn ghế ngồi</h4>
+                                <p>Nhấp vào sơ đồ toa tàu để chọn ghế. Ghế màu trắng là ghế trống, ghế màu đỏ là ghế đã bán.</p>
+                                <img src="/img/chonchongoi.png" alt="" style="width: 80%;">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">4</div>
+                            <div class="timeline-content">
+                                <h4>Nhập thông tin khách hàng</h4>
+                                <p>Chọn đối tượng phù hợp. Nhập họ tên, CCCD/CMND, Số điện thoại và Email (nếu có).</p>
+                                  <img src="/img/muave2.png" alt="Sơ đồ ghế ngồi" class="doc-image mt-2" style="width: 80%;">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">5</div>
+                            <div class="timeline-content">
+                                <h4>Thanh toán</h4>
+                                <p>Chọn phương thức thanh toán (Tiền mặt, Chuyển khoản, Thẻ).</p>
+                                <p>Có thể treo đơn nếu chưa thanh toán.</p>
+                                <img src="/img/thanhtoan.png" alt="" style="width: 80%;">
+                            </div>
+                        </div>
+                         <div class="timeline-item">
+                            <div class="timeline-dot">6</div>
+                            <div class="timeline-content">
+                                <h4>Xác nhận thanh toán</h4>
+                                <p>Thông báo xác nhận thanh toán. Chọn 4 chức năng trên màn hình để tiếp tục.</p>
+                                <img src="/img/xacnhan.png" alt="" style="width: 80%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                          <h3>Mua vé thành công</h3>
+                          <img src="/img/dadatcho.png" alt="" style="width: 80%;">
+                          <p>Những chỗ đã được đặt sẽ hiện đỏ như hình.</p>
+                    </div>
+
+                    <div class="warning-box mt-3">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <div>
+                            <strong>Lưu ý quan trọng:</strong> Đối với vé trẻ em/sinh viên/người cao tuổi (được giảm giá), nhân viên bắt buộc phải kiểm tra thẻ giấy tờ tùy thân trước khi xuất vé.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Trả vé -->
+            <section id="tra-ve" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-rotate-left"></i> Hướng dẫn trả vé</h2>
+                <div class="card">
+                    <h3>Điều kiện trả vé</h3>
+                    <ul class="styled-list">
+                        <li>Hành khách phải trả vé trước giờ tàu chạy ít nhất 24 tiếng.</li>
+                        <li>Phí trả vé thường là 10% - 20% tùy theo thời điểm trả.</li>
+                    </ul>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot">1</div>
+                            <div class="timeline-content">
+                                <h4>Chọn menu trả vé</h4>
+                                <p>Trên màn hình có 2 bảng hóa đơn và bảng vé.</p>
+                                <img src="/img/trave.png" alt="" style="width: 80%">
+                            </div>
+                        </div>
+                        <div class="timeline-item"> 
+                            <div class="timeline-dot">2</div>
+                            <div class="timeline-content">
+                                <h4>Nhập thông tin hóa đơn trả và tìm hóa đơn</h4>
+                                <p>Khi chọn hóa đơn, bảng vé sẽ hiển thị các vé của hóa đơn.</p>
+                                  <img src="/img/trave1.png" alt="" style="width: 80%">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">3</div>
+                            <div class="timeline-content">
+                                <h4>Trả vé</h4>
+                                <p>Tại bảng Bảng vé chọn vé cần trả và chọn <strong>trả vé</strong> hoặc <strong>trả tập vé (trả toàn bộ)</strong>.</p>
+                                <img src="/img/trave2.png" alt="" style="width: 80%;">
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot">4</div>
+                            <div class="timeline-content">
+                                <h4>Xác nhận trả vé</h4>
+                                <p>Hệ thống hiển thị xác nhận trả vé.</p>
+                                  <img src="/img/xacnhantrave.png" alt="Xác nhận trả vé" class="doc-image mt-2" style="width: 60%;">
+                                <p>Nếu đồng ý trả hóa đơn thì chọn Yes, ngược lại chọn No.</p>
+                            </div>
+                        </div>
+                    
+                    <h3>Thông báo lỗi phổ biến</h3>
+                    <ul class="styled-list">
+                        <li><em>"Vé đã qua sử dụng":</em> Hành khách đã lên tàu hoặc vé đã được quét qua cổng kiểm soát.</li>
+                        <li><em>"Quá thời gian được phép trả vé":</em> Thời điểm hiện tại đã sát giờ tàu chạy, không hỗ trợ hoàn vé.</li>
+                    </ul>
+                </div>
+            </section>
+          <!-- 5. In hóa đơn -->
+            <section id="tra-ve" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-rotate-left"></i>Hướng dẫn in hóa đơn/in vé</h2>
+                <div class="card">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot">1</div>
+                            <div class="timeline-content">
+                                <h4>Chọn nút in hóa đơn hoặc in vé</h4>
+                                <img src="/img/inhoadon.png" alt="" style="width: 80%">
+                                <ul>
+                                    <li>Hệ thống sẽ có 1 file lưu trữ vé.</li>
+                                    <li>Chọn vào file đó và in ra.</li>
+                                </ul>
+                            </div>
+                        </div>
+                </div>
+            </section>
+
+            <!-- 6. Quản lý khách hàng -->
+            <section id="quan-ly-khach-hang" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-users"></i> Quản lý khách hàng</h2>
+                <div class="card">
+                    <p>Hỗ trợ lưu trữ thông tin để phục vụ khách hàng tốt hơn, đặc biệt đối với khách hàng thường xuyên.</p>
+                    <ul class="styled-list">
+                        <img src="/img/khachhang.png" alt="" style="width:90%">
+                        <li><strong>Tìm kiếm:</strong> Nhập Số điện thoại hoặc CCCD vào ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Xóa trắng:</strong> Xóa toàn bộ ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Cập nhật:</strong> Cập nhật thông tin khách hàng.</li>
+                        <li><strong>Xuất Excel:</strong> Xuất khách hàng ra file.</li>
+                    </ul>
+                    
+                    <h3>Giải thích các trường dữ liệu</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Trường dữ liệu</th>
+                                <th>Ý nghĩa</th>
+                                <th>Bắt buộc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Họ và tên</td>
+                                <td>Tên khách hàng đi tàu, phải khớp với giấy tờ tùy thân.</td>
+                                <td>Có</td>
+                            </tr>
+                            <tr>
+                                <td>CCCD/CMND</td>
+                                <td>Số thẻ căn cước công dân.</td>
+                                <td>Có</td>
+                            </tr>
+                            <tr>
+                                <td>Số điện thoại</td>
+                                <td>Dùng để gửi SMS thông báo, nhận mã vé điện tử.</td>
+                                <td>Có</td>
+                            </tr>
+                             <tr>
+                                <td>Email</td>
+                                <td>Dùng để gửi mã vé điện tử.</td>
+                                <td>Có</td>
+                            </tr>
+                             <tr>
+                                <td>Đối tượng</td>
+                                <td>Đối tượng phù hợp để giảm giá.</td>
+                                <td>Không</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 7. Quản lý nhân viên -->
+            <section id="quan-ly-nhan-vien" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-user-tie"></i> Quản lý nhân viên</h2>
+                <div class="card">
+                    <div class="warning-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            <strong>Quyền hạn:</strong> Chỉ tài khoản cấp <em>Quản lý</em> mới truy cập được chức năng này.
+                        </div>
+                    </div>
+                     <ul class="styled-list">
+                        <img src="/img/nhanvien.png" alt="" style="width: 90%;">
+                        
+                        <li><strong>Tìm kiếm:</strong> Nhập Số điện thoại hoặc CCCD vào ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Xóa trắng:</strong> Xóa toàn bộ ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Thêm:</strong>Thêm mới nhân viên ở góc trên.</li>
+                        <li><strong>Cập nhật:</strong> Cập nhật thông tin khách hàng.</li>
+                        <li><strong>Xuất Excel:</strong> Xuất khách hàng ra file.</li>
+                        <li><strong>Tạo tài khoản:</strong>Tạo tài khoản cho nhân viên chưa có tài khoản.</li>
+                    </ul>
+                    <h3>Phân quyền quản lý</h3>
+                    <ul class="styled-list">
+                        <li><strong>Nhân viên bán vé:</strong> Chỉ có quyền bán vé, trả vé, xem thống kê cá nhân, xem khách hàng.</li>
+                        <li><strong>Quản lý ca:</strong> Có quyền xem toàn bộ chức năng của hệ thống.</li>
+                    </ul>
+                </div>
+            </section>
+            <!-- 7. Tạo tài khoản -->
+            <section id="tao-tai-khoan" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-user-tie"></i> Tạo tài khoản</h2>
+                <div class="card">
+                    <div class="warning-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            <strong>Quyền hạn:</strong> Chỉ tài khoản cấp <em>Quản lý</em> mới truy cập được chức năng này.
+                        </div>
+                    </div>
+                     <ul class="styled-list">
+                        <img src="/img/taikhoan.png" alt="" style="width: 90%;">
+                         <ol class="styled-list">
+                        <li>Chọn nhân viên muốn tạo tài khoản bằng cách chọn trực tiếp trên bảng hoặc tìm nhân viên bằng CCCD hay số điện thoại.</li>
+                        <li>NNhấn nút <strong>Thêm</strong> để lưu lại tài khoản vừa mới tạo</li>
+                    </ol>
+                        <li><strong>Tìm kiếm:</strong> Nhập Số điện thoại hoặc CCCD vào ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Xóa trắng:</strong> Xóa toàn bộ ô tìm kiếm ở góc trên.</li>
+                        <li><strong>Thêm:</strong>Thêm mới tài khoản cho nhân viên ở góc trên.</li>
+                        <li><strong>Cập nhật:</strong> Cập nhật thông tin tài khoản.</li>
+                    </ul>
+                    <h3>Phân quyền quản lý</h3>
+                    <ul class="styled-list">
+                        <li><strong>Nhân viên bán vé:</strong> Chỉ có quyền bán vé, trả vé, xem thống kê cá nhân, xem khách hàng.</li>
+                        <li><strong>Quản lý ca:</strong> Có quyền xem toàn bộ chức năng của hệ thống.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 8. Khuyến mãi -->
+            <section id="quan-ly-khuyen-mai" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-tags"></i> Quản lý khuyến mãi</h2>
+                <div class="card">
+                    <div class="warning-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            <strong>Quyền hạn:</strong> Chỉ tài khoản cấp <em>Quản lý</em> mới truy cập được chức năng này.
+                        </div>
+                    </div>
+                    <h3>Tạo khuyến mãi mới</h3>
+                    <p>Chức năng tạo mã giảm giá hoặc chương trình giảm giá tự động cho các dịp lễ tết.</p>
+                    
+                    <ul class="styled-list">
+                        <li><strong>Điều kiện áp dụng:</strong> Có thể thiết lập giảm theo % hoặc giảm trực tiếp số tiền.</li>
+                        <li><strong>Thời hạn khuyến mãi:</strong> Thiết lập ngày bắt đầu và ngày kết thúc.</li>
+                    </ul>
+
+                    <h3>Trạng thái</h4>
+                    <p>Hệ thống tự động gắn nhãn: <span class="badge badge-green">Hoạt động</span>, <span class="badge badge-gray">Hết hạn</span>.</p>
+                    <h3>Phân quyền quản lý</h3>
+                    <ul class="styled-list">
+                        <li><strong>Nhân viên bán vé:</strong> Chỉ có quyền bán vé, trả vé, xem thống kê cá nhân, xem khách hàng.</li>
+                        <li><strong>Quản lý ca:</strong> Có quyền xem toàn bộ chức năng của hệ thống.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 9. Tra cứu -->
+            <section id="tra-cuu" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-file-invoice"></i> Tra cứu vé & hóa đơn</h2>
+                <div class="card">
+                    <h3>Cách tra cứu</h3>
+                    <p>Bạn có thể tra cứu thông tin nhanh bằng:</p>
+                    <ul class="styled-list">
+                        <li><strong>Mã hóa đơn hoặc mã vé:</strong> Nhập chuỗi kí tự.</li>
+                        <li><strong>Số điện thoại:</strong> Liệt kê tất cả các vé khách đã mua.</li>
+                    </ul>
+
+                    <h3>Xử lý hóa đơn</h3>
+                    <p>Trong chi tiết một vé đã xuất, bạn có thể <strong>Xem thông tin hóa đơn</strong> (hóa đơn VAT điện tử) và bấm <strong>In lại hóa đơn</strong> trong trường hợp khách hàng làm mất hoặc yêu cầu in lại bản giấy.</p>
+                </div>
+            </section>
+
+            <!-- 10. Thống kê -->
+            <section id="thong-ke" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-chart-line"></i> Thống kê báo cáo</h2>
+                <div class="card">
+                    <p>Hệ thống cung cấp báo cáo chi tiết để phục vụ việc đối soát và nộp tiền ca.</p>
+                    
+                    <ul class="styled-list">
+                        <li><strong>Thống kê doanh thu:</strong> Tổng tiền thực thu theo tháng.</li>
+                         <img src="/img/thongke1.png" alt="" style="width: 90%;">
+                        <li><strong>Thống kê lượt vé:</strong> Số lượng vé xuất, số lượng vé trả theo ngày trong tháng.</li>
+                        <img src="/img/thongke2.png" alt="" style="width: 90%;">
+                        <li><strong>Bộ lọc:</strong> Lọc dữ liệu theo Ngày/Tháng/Năm</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 11. FAQ -->
+            <section id="faq" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-circle-question"></i> Câu hỏi thường gặp (FAQ)</h2>
+                <div class="card">
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Không tìm thấy vé khi tra cứu bằng số điện thoại? <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p>Đảm bảo số điện thoại khách hàng cung cấp chính xác là số đã dùng lúc mua vé. Đôi khi khách hàng mua qua đại lý không cung cấp đúng số điện thoại cá nhân. Vui lòng thử tra cứu bằng CCCD.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Không in được hóa đơn sau khi xuất vé? <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p>Kiểm tra kết nối của máy in nhiệt với máy tính. Hãy chắc chắn giấy in chưa hết và driver máy in đang hoạt động bình thường. Có thể vào mục <em>Tra cứu vé</em> để in lại.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Khách đã thanh toán chuyển khoản nhưng hệ thống chưa ghi nhận? <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p>Do độ trễ của ngân hàng, có thể mất từ 1-5 phút. Vui lòng bấm nút "Làm mới" (Refresh) trên màn hình thanh toán. Nếu sau 10 phút vẫn chưa nhận, liên hệ bộ phận Kế toán hỗ trợ đối soát.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                Không đăng nhập được vào đầu ca làm việc? <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <p>Nếu hệ thống báo sai mật khẩu, vui lòng dùng tính năng "Quên mật khẩu" hoặc báo Quản lý trạm để reset. Nếu hệ thống báo "Lỗi kết nối", vui lòng kiểm tra dây mạng LAN.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12. Liên hệ -->
+            <section id="lien-he" class="doc-section fade-in">
+                <h2><i class="fa-solid fa-headset"></i> Liên hệ hỗ trợ</h2>
+                <div class="card">
+                    <p>Nếu bạn gặp sự cố kỹ thuật nghiêm trọng không thể tự khắc phục, vui lòng liên hệ đội ngũ IT hỗ trợ kỹ thuật qua các kênh sau:</p>
+                    
+                    <div class="grid-2 mt-3">
+                        <div class="info-card">
+                            <i class="fa-solid fa-phone text-blue"></i>
+                            <h4>Hotline Kỹ thuật</h4>
+                            <p class="fs-large">1900 8888 (Phím 2)</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fa-solid fa-envelope text-blue"></i>
+                            <h4>Email Hỗ trợ</h4>
+                            <p class="fs-large">it-support@vetau.vn</p>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-4">Form gửi phản hồi sự cố</h3>
+                    <form class="contact-form" onsubmit="event.preventDefault(); alert('Cảm ơn bạn đã phản hồi, chúng tôi sẽ liên hệ lại sớm nhất!');">
+                        <div class="form-group">
+                            <label for="name">Tên nhân viên</label>
+                            <input type="text" id="name" required placeholder="Nhập tên của bạn">
+                        </div>
+                        <div class="form-group">
+                            <label for="issue">Mô tả sự cố</label>
+                            <textarea id="issue" rows="4" required placeholder="Mô tả chi tiết lỗi bạn đang gặp..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Gửi phản hồi</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" class="back-to-top" aria-label="Go to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
