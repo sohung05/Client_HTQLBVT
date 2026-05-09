@@ -30,6 +30,8 @@ public class Main extends javax.swing.JFrame {
     private Header header;
     private MainForm main;
     private Animator animator;
+    private int currentMenuIndex = 0;
+    private int currentSubMenuIndex = -1;
 
     public Main() {
         initComponents();
@@ -65,145 +67,9 @@ public class Main extends javax.swing.JFrame {
         menu.addEvent(new EventMenuSelected() {
             @Override
             public void menuSelected(int menuIndex, int subMenuIndex) {
-                System.out.println("📍 Menu clicked - Index: " + menuIndex + " | SubMenu: " + subMenuIndex + " | ChucVu: " + chucVu);
-                
-                // Nếu là Nhân viên (chucVu = 1), điều chỉnh menu index
-                int adjustedMenuIndex = menuIndex;
-                if (chucVu == 1 && menuIndex >= 3) {
-                    // Nhân viên không thấy menu 3 (Nhân Viên) và 4 (Khuyến Mãi)
-                    // Menu 3 (Thống Kê cho nhân viên) → thực tế là menu 5
-                    adjustedMenuIndex = menuIndex + 2;
-                    System.out.println("   🔄 Điều chỉnh index: " + menuIndex + " → " + adjustedMenuIndex);
-                }
-                
-                System.out.println("   ✅ Xử lý case: " + adjustedMenuIndex);
-                switch (adjustedMenuIndex) {
-                    case 0: // Dashboard
-                        System.out.println("      📊 Menu Dashboard");
-                        if (subMenuIndex == 0 || subMenuIndex == -1) {
-                            System.out.println("      ✅ Mở Dashboard");
-                            main.showForm(new Gui_Dashboard());
-                        }
-                        break;
-                    case 1: // Vé
-                        System.out.println("      🎫 Menu Vé - SubIndex: " + subMenuIndex);
-                        switch (subMenuIndex) {
-                            case 0: // Bán Vé
-                                System.out.println("      ✅ Mở Bán Vé");
-                                // Tạo màn hình nhập thông tin hành trình
-                                Gui_NhapThongTinHanhTrinh guiNhapThongTin = new Gui_NhapThongTinHanhTrinh();
-                                
-                                // Set callback để chuyển sang màn hình bán vé khi tìm kiếm
-                                guiNhapThongTin.setCallback(info -> {
-                                    System.out.println("✅ Tìm kiếm: " + info.getGaDi() + " → " + info.getGaDen() 
-                                                      + " | Ngày: " + info.getNgayDi());
-                                    
-                                    // Chuyển sang màn hình bán vé với thông tin đã nhập
-                                    Gui_BanVe guiBanVe = new Gui_BanVe(info);
-                                    main.showForm(guiBanVe);
-                                });
-                                
-                                main.showForm(guiNhapThongTin);
-                                break;
-                            case 1: // Trả Vé
-                                System.out.println("      ✅ Mở Trả Vé");
-                                main.showForm(new Gui_TraVe());
-                                break;
-                            case 2: // Đổi Vé
-                                System.out.println("      ✅ Mở Đổi Vé");
-                                main.showForm(new Gui_DoiVe());
-                                break;
-                            default:
-                                System.out.println("      ⚠️ SubIndex không hợp lệ: " + subMenuIndex);
-                                break;
-                        }
-                        break;
-                    case 2: // Khách Hàng
-                        System.out.println("      👥 Menu Khách Hàng");
-                        if (subMenuIndex == 0 || subMenuIndex == -1) {
-                            System.out.println("      ✅ Mở Khách Hàng");
-                            main.showForm(new Gui_KhachHang());
-                        }
-                        break;
-                    case 3: // Nhân Viên
-                        System.out.println("      👤 Menu Nhân Viên");
-                        if (subMenuIndex == 0 || subMenuIndex == -1) {
-                            System.out.println("      ✅ Mở Nhân Viên");
-                            main.showForm(new Gui_NhanVien());
-                        }
-                        break;
-                    case 4: // Khuyễn Mãi
-                        System.out.println("      🎁 Menu Khuyến Mãi - SubIndex: " + subMenuIndex);
-                        switch (subMenuIndex) {
-                            case 0: // Khuyến mãi theo hóa đơn
-                                System.out.println("      ✅ Mở KM Hóa Đơn");
-                                main.showForm(new Gui_KhuyenMaiHoaDon());
-                                break;
-                            case 1: // Khuyến mãi theo đối tượng
-                                System.out.println("      ✅ Mở KM Đối Tượng");
-                                main.showForm(new Gui_KhuyenMaiDoiTuong());
-                                break;
-                            default:
-                                System.out.println("      ⚠️ SubIndex không hợp lệ: " + subMenuIndex);
-                                break;
-                        }
-                        break;
-                    case 5: // Thống Kê
-                        System.out.println("      📊 Menu Thống Kê - SubIndex: " + subMenuIndex);
-                        switch (subMenuIndex) {
-                            case 0: // Doanh Thu
-                                System.out.println("      ✅ Mở TK Doanh Thu");
-                                main.showForm(new Gui_ThongKeDoanhThu());
-                                break;
-                            case 1: // Lượt Vé
-                                System.out.println("      ✅ Mở TK Lượt Vé");
-                                main.showForm(new Gui_ThongKeLuotVe());
-                                break;
-                            default:
-                                System.out.println("      ⚠️ SubIndex không hợp lệ: " + subMenuIndex);
-                                break;
-                        }
-                        break;
-                    case 6: // Trợ Giúp
-                        System.out.println("      ❓ Menu Trợ Giúp");
-                        if (subMenuIndex == 0 || subMenuIndex == -1) {
-                            System.out.println("      ✅ Mở Trợ Giúp");
-                            try {
-                                // Mở file HTML trợ giúp cục bộ
-                                java.io.File file = new java.io.File("src/main/resources/TroGiup/index.html");
-                                if (file.exists()) {
-                                    Desktop.getDesktop().browse(file.toURI());
-                                } else {
-                                    System.err.println("❌ Không tìm thấy file trợ giúp tại: " + file.getAbsolutePath());
-                                    javax.swing.JOptionPane.showMessageDialog(Main.this, "Không tìm thấy file trợ giúp!");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        break;
-                    case 7: // Đăng Xuất
-                        System.out.println("      🚪 Menu Đăng Xuất");
-                        if (subMenuIndex == 0 || subMenuIndex == -1) {
-                            System.out.println("      ✅ Đăng xuất - Quay lại màn hình đăng nhập");
-                            
-                            // Clear session
-                            utils.SessionManager.getInstance().logout();
-                            
-                            // Mở lại màn hình đăng nhập
-                            javax.swing.SwingUtilities.invokeLater(() -> {
-                                LoginFrame loginFrame = new LoginFrame();
-                                loginFrame.setVisible(true);
-                            });
-                            
-                            // Đóng màn hình chính hiện tại
-                            javax.swing.SwingUtilities.getWindowAncestor(main).dispose();
-                        }
-                        break;
-                    default:
-                        System.out.println("      ❌ Menu không hợp lệ: " + adjustedMenuIndex);
-                        break;
-                }
+                currentMenuIndex = menuIndex;
+                currentSubMenuIndex = subMenuIndex;
+                showSelectedForm(menuIndex, subMenuIndex);
             }
         });
         
@@ -247,8 +113,6 @@ public class Main extends javax.swing.JFrame {
         };
         animator = new Animator(500, target);
         animator.setResolution(0);
-        animator.setDeceleration(0.5f);
-        animator.setAcceleration(0.5f);
         header.addMenuEvent(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -261,10 +125,98 @@ public class Main extends javax.swing.JFrame {
                 }
             }
         });
+        header.addReloadEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                System.out.println("🔄 Reloading current form - Menu: " + currentMenuIndex + " | SubMenu: " + currentSubMenuIndex);
+                showSelectedForm(currentMenuIndex, currentSubMenuIndex);
+            }
+        });
         //  Init google icon font
         IconFontSwing.register(GoogleMaterialDesignIcons.getIconFont());
         //  Start with this form
         main.showForm(new Gui_Dashboard());
+    }
+
+    private void showSelectedForm(int menuIndex, int subMenuIndex) {
+        NhanVien nv = SessionManager.getInstance().getNhanVienDangNhap();
+        int chucVu = (nv != null) ? nv.getChucVu() : 0;
+
+        System.out.println("📍 Showing Form - Index: " + menuIndex + " | SubMenu: " + subMenuIndex + " | ChucVu: " + chucVu);
+
+        // Nếu là Nhân viên (chucVu = 1), điều chỉnh menu index
+        int adjustedMenuIndex = menuIndex;
+        if (chucVu == 1 && menuIndex >= 3) {
+            adjustedMenuIndex = menuIndex + 2;
+        }
+
+        switch (adjustedMenuIndex) {
+            case 0: // Dashboard
+                main.showForm(new Gui_Dashboard());
+                break;
+            case 1: // Vé
+                switch (subMenuIndex) {
+                    case 0: // Bán Vé
+                        Gui_NhapThongTinHanhTrinh guiNhapThongTin = new Gui_NhapThongTinHanhTrinh();
+                        guiNhapThongTin.setCallback(info -> {
+                            Gui_BanVe guiBanVe = new Gui_BanVe(info);
+                            main.showForm(guiBanVe);
+                        });
+                        main.showForm(guiNhapThongTin);
+                        break;
+                    case 1: // Trả Vé
+                        main.showForm(new Gui_TraVe());
+                        break;
+                    case 2: // Đổi Vé
+                        main.showForm(new Gui_DoiVe());
+                        break;
+                }
+                break;
+            case 2: // Khách Hàng
+                main.showForm(new Gui_KhachHang());
+                break;
+            case 3: // Nhân Viên
+                main.showForm(new Gui_NhanVien());
+                break;
+            case 4: // Khuyến Mãi
+                switch (subMenuIndex) {
+                    case 0: // KM Hóa Đơn
+                        main.showForm(new Gui_KhuyenMaiHoaDon());
+                        break;
+                    case 1: // KM Đối Tượng
+                        main.showForm(new Gui_KhuyenMaiDoiTuong());
+                        break;
+                }
+                break;
+            case 5: // Thống Kê
+                switch (subMenuIndex) {
+                    case 0: // Doanh Thu
+                        main.showForm(new Gui_ThongKeDoanhThu());
+                        break;
+                    case 1: // Lượt Vé
+                        main.showForm(new Gui_ThongKeLuotVe());
+                        break;
+                }
+                break;
+            case 6: // Trợ Giúp
+                try {
+                    java.io.File file = new java.io.File("src/main/resources/TroGiup/index.html");
+                    if (file.exists()) {
+                        Desktop.getDesktop().browse(file.toURI());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 7: // Đăng Xuất
+                utils.SessionManager.getInstance().logout();
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
+                });
+                javax.swing.SwingUtilities.getWindowAncestor(main).dispose();
+                break;
+        }
     }
 
     @SuppressWarnings("unchecked")

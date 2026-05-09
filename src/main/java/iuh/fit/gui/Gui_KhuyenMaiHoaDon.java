@@ -54,7 +54,7 @@ public class Gui_KhuyenMaiHoaDon extends JPanel {
                         km.getDoiTuongApDung(),
                         startFormatted,
                         endFormatted,
-                        km.getChietKhau() * 100,
+                        km.getChietKhau(),
                         (end != null && end.isBefore(now)) ? "Hết hạn" : (trangThaiBool ? "Hoạt động" : "Tạm ngưng")
                 };
 

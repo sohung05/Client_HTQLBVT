@@ -61,7 +61,7 @@ public class Gui_KhuyenMaiDoiTuong extends JPanel {
                         km.getDoiTuongApDung(),
                         startFormatted,
                         endFormatted,
-                        km.getChietKhau() * 100, // Hiển thị dạng %
+                        km.getChietKhau(), // Hiển thị dạng số thực (0.x) tương ứng demo
                         (end != null && end.isBefore(now)) ? "Hết hạn" : (trangThaiBool ? "Hoạt động" : "Tạm ngưng")
                 };
 
